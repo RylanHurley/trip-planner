@@ -2,6 +2,7 @@ package com.rylanhurley.tripplanner;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
 
 import java.time.LocalDate;
 
@@ -15,11 +16,21 @@ public class Trip {
     private LocalDate endDate;
     private int targetSize;
     private LocalDate commitDeadline;
+    @ManyToOne
+    private TripGroup tripGroup;
 
     public Trip(){}
 
     public Long getId() {
         return id;
+    }
+
+    public TripGroup getTripGroup() {
+        return tripGroup;
+    }
+
+    public void setTripGroup(TripGroup tripGroup) {
+        this.tripGroup = tripGroup;
     }
 
     public String getName() {
@@ -42,9 +53,7 @@ public class Trip {
         return commitDeadline;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+
 
     public void setName(String name) {
         this.name = name;
