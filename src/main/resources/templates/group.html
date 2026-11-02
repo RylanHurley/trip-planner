@@ -9,6 +9,33 @@
 <h1 th:text="${group.name}">Group name</h1>
 <p>Share this link with your group:</p>
 <p><code th:text="'/g/' + ${group.inviteToken}">/g/token</code></p>
+
+<h2>Trips</h2>
+<p th:if="${trips.isEmpty()}">No trips yet.</p>
+<ul>
+    <li th:each="trip : ${trips}">
+        <span th:text="${trip.name}">Trip name</span>:
+        <span th:text="${trip.startDate}">start</span> to <span th:text="${trip.endDate}">end</span>,
+        need <span th:text="${trip.targetSize}">0</span> people,
+        commit by <span th:text="${trip.commitDeadline}">deadline</span>
+    </li>
+</ul>
+
+<h2>Add a trip</h2>
+<form th:action="'/g/' + ${group.inviteToken} + '/trips'" method="post">
+    <label for="name">Trip name</label>
+    <input id="name" name="name" type="text" required maxlength="50">
+    <label for="startDate">Start date</label>
+    <input id="startDate" name="startDate" type="date" required>
+    <label for="endDate">End date</label>
+    <input id="endDate" name="endDate" type="date" required>
+    <label for="targetSize">How many people</label>
+    <input id="targetSize" name="targetSize" type="number" min="1" required>
+    <label for="commitDeadline">Commit by</label>
+    <input id="commitDeadline" name="commitDeadline" type="date" required>
+    <button type="submit">Add trip</button>
+</form>
+
 <a href="/">Back to home</a>
 </body>
 </html>
