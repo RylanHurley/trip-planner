@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title th:text="${trip.name}">Trip</title>
+</head>
+<body>
+<h1 th:text="${trip.name}">Trip name</h1>
+<p>
+    <span th:text="${trip.startDate}">start</span> to <span th:text="${trip.endDate}">end</span>,
+    need <span th:text="${trip.targetSize}">0</span> people,
+    commit by <span th:text="${trip.commitDeadline}">deadline</span>
+</p>
+
+<h2>Costs</h2>
+<p th:if="${costs.isEmpty()}">No costs yet.</p>
+<ul>
+    <li th:each="cost : ${costs}">
+        <span th:text="${cost.name}">Cost name</span>:
+        $<span th:text="${cost.amount}">0.00</span>
+        <span th:if="${cost.splitType.name() == 'SPLIT'}">split between everyone</span>
+        <span th:if="${cost.splitType.name() == 'EACH'}">per person</span>
+    </li>
+</ul>
+
+<h2>Add a cost</h2>
+<form th:action="'/g/' + ${group.inviteToken} + '/trips/' + ${trip.id} + '/costs'" method="post">
+    <label for="name">What is it</label>
+    <input id="name" name="name" type="text" required maxlength="50">
+    <label for="amount">Amount ($)</label>
+    <input id="amount" name="amount" type="number" min="0.01" step="0.01" required>
+    <label for="splitType">How it's paid</label>
+    <select id="splitType" name="splitType">
+        <option value="SPLIT">Split the total between everyone</option>
+        <option value="EACH">Everyone pays this amount</option>
+    </select>
+    <button type="submit">Add cost</button>
+</form>
+
+<a th:href="'/g/' + ${group.inviteToken}">Back to group</a>
+</body>
+</html>

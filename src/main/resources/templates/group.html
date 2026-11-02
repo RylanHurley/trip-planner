@@ -14,7 +14,7 @@
 <p th:if="${trips.isEmpty()}">No trips yet.</p>
 <ul>
     <li th:each="trip : ${trips}">
-        <span th:text="${trip.name}">Trip name</span>:
+        <a th:href="'/g/' + ${group.inviteToken} + '/trips/' + ${trip.id}" th:text="${trip.name}">Trip name</a>:
         <span th:text="${trip.startDate}">start</span> to <span th:text="${trip.endDate}">end</span>,
         need <span th:text="${trip.targetSize}">0</span> people,
         commit by <span th:text="${trip.commitDeadline}">deadline</span>
