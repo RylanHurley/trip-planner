@@ -1,6 +1,8 @@
 package com.rylanhurley.tripplanner;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 @Controller
@@ -26,5 +28,15 @@ public class GroupController {
             groupRepository.save(group);
             return "redirect:/g/" + group.getInviteToken();
         }
+    }
+
+    @GetMapping("/g/{token}")
+    public String showGroup(@PathVariable String token, Model model) {
+        TripGroup group = groupRepository.findByInviteToken(token);
+        if (group == null) {
+            return "redirect:/";
+        }
+        model.addAttribute("group", group);
+        return "group";
     }
 }

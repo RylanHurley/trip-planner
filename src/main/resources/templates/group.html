@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title th:text="${group.name}">Group</title>
+</head>
+<body>
+<h1 th:text="${group.name}">Group name</h1>
+<p>Share this link with your group:</p>
+<p><code th:text="'/g/' + ${group.inviteToken}">/g/token</code></p>
+<a href="/">Back to home</a>
+</body>
+</html>
