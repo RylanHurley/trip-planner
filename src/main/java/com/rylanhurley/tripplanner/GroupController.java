@@ -114,7 +114,7 @@ public class GroupController {
         Trip trip = tripRepository.findById(tripId).orElse(null);
         if (trip == null || !trip.getTripGroup().getId().equals(group.getId())) { return "redirect:/g/" + token; }
         String trimmed = name.trim();
-        if (trimmed.isEmpty() || participantRepository.existsByTripAndNameIgnoreCase(trip, trimmed)) {
+        if (trimmed.length() > 30 || trimmed.isEmpty() || participantRepository.existsByTripAndNameIgnoreCase(trip, trimmed)) {
             return "redirect:/g/" + token + "/trips/" + tripId;
         }
         Participant participant = new Participant();
