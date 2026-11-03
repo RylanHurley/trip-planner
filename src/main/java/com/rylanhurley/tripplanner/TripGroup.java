@@ -16,6 +16,8 @@ public class TripGroup {
     private String name;
     @Column(unique = true)
     private String inviteToken = UUID.randomUUID().toString();
+    @Column(unique = true)
+    private String organizerToken = UUID.randomUUID().toString();
 
     public TripGroup() {
     }
@@ -34,6 +36,14 @@ public class TripGroup {
 
     public String getInviteToken() {
         return inviteToken;
+    }
+
+    public String getOrganizerToken() {
+        return organizerToken;
+    }
+
+    public boolean isOrganizer(String org) {
+        return organizerToken.equals(org);
     }
 
 
