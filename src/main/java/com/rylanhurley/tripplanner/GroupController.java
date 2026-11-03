@@ -67,6 +67,7 @@ public class GroupController {
         if (name.isBlank() || name.length() > 50 || targetSize < 1 || commitDeadline.isAfter(startDate)) {
             return "redirect:/g/" + token;
         }
+        if(startDate.isBefore(LocalDate.now())) {return "redirect:/g/" + token;}
         Trip trip = new Trip();
         trip.setName(name);
         trip.setStartDate(startDate);
