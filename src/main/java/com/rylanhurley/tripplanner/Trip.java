@@ -74,4 +74,12 @@ public class Trip {
     public void setCommitDeadline(LocalDate commitDeadline) {
         this.commitDeadline = commitDeadline;
     }
+
+    public boolean isCommitOpen(LocalDate today) {
+        return !today.isAfter(commitDeadline);
+    }
+
+    public boolean isOn(int peopleIn) {
+        return peopleIn >= targetSize;
+    }
 }
