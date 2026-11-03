@@ -4,8 +4,8 @@
     --card: #ffffff;
     --text: #1d2330;
     --muted: #5b6475;
-    --accent: #2563eb;
-    --accent-dark: #1d4ed8;
+    --accent: #16a34a;
+    --accent-dark: #15803d;
     --good: #15803d;
     --bad: #b91c1c;
     --border: #dde1e8;
@@ -124,3 +124,5 @@ button:hover,
     display: inline-block;
     margin-top: 24px;
 }
+h1 { font-size: 1.5rem; }                         /* phones: default */
+@media (min-width: 600px) { h1 { font-size: 2.25rem; } }  /* wide screens only */

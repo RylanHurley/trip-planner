@@ -126,7 +126,7 @@ public class GroupController {
             return "redirect:/g/" + token + "/trips/" + tripId;
         }
         String trimmed = name.trim();
-        if (trimmed.isEmpty() || participantRepository.existsByTripAndNameIgnoreCase(trip, trimmed)) {
+        if (trimmed.length() > 30 || trimmed.isEmpty() || participantRepository.existsByTripAndNameIgnoreCase(trip, trimmed)) {
             return "redirect:/g/" + token + "/trips/" + tripId;
         }
         Participant participant = new Participant();
