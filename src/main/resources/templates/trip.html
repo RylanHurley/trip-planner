@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
+    <link rel="stylesheet" href="/css/style.css">
     <title th:text="${trip.name}">Trip</title>
 </head>
 <body>
@@ -15,8 +16,8 @@
 
 <h2>Who's in</h2>
 <p><span th:text="${participants.size()}">0</span> of <span th:text="${trip.targetSize}">0</span> in</p>
-<p th:if="${tripOn}"><strong>The trip is on!</strong></p>
-<p th:if="${!tripOn and !commitOpen}"><strong>Commits closed. Didn't hit the target.</strong></p>
+<p th:if="${tripOn}" class="status-on"><strong>The trip is on!</strong></p>
+<p th:if="${!tripOn and !commitOpen}" class="status-closed"><strong>Commits closed. Didn't hit the target.</strong></p>
 <p th:if="${!tripOn and commitOpen}">Commit by <span th:text="${trip.commitDeadline}">deadline</span>.</p>
 <ul>
     <li th:each="participant : ${participants}" th:text="${participant.name}">Name</li>
@@ -52,6 +53,6 @@
     <button type="submit">Add cost</button>
 </form>
 
-<a th:href="'/g/' + ${group.inviteToken}">Back to group</a>
+<a class="back" th:href="'/g/' + ${group.inviteToken}">Back to group</a>
 </body>
 </html>
