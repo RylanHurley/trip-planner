@@ -11,6 +11,7 @@ Plan group trips without the group-chat chaos: make a private group, share one i
 
 ## Features
 - **Private groups via invite link.** Each group gets an unguessable UUID token; anyone with the link can see the group, nobody else can find it.
+- **Organizer link.** The creator also gets a private organizer link (a second UUID). Only that link can add trips and costs; the invite link can view and join.
 - **Trips** with dates, a target group size, and a commit deadline.
 - **"I'm in"**: people join a trip by name (duplicate names blocked). The page shows "4 of 6 in" and flips to **"The trip is on!"** when the target is hit.
 - **Commit deadline**: joining closes after the deadline day.
@@ -23,6 +24,7 @@ Java 21 · Spring Boot · Spring MVC + Thymeleaf · Spring Data JPA / Hibernate 
 ## Design decisions
 - **UUID invite tokens** with a unique database constraint, so links can't be guessed or collide.
 - **`BigDecimal` for money.** `double` stores numbers in binary, so 0.1 + 0.2 = 0.30000000000000004; money has to be exact.
+- **Server-side validation.** Browser `maxlength`/`min` only help honest users, so the server re-checks name lengths, group size, and that the commit deadline is before the trip starts.
 - **Access check on every trip URL.** A trip id from the URL is only used if that trip belongs to the group in the invite token, so changing the id in the URL can't open another group's trip.
 - **Testable time.** `Trip.isCommitOpen(LocalDate today)` takes the date as a parameter instead of calling `LocalDate.now()` inside, so a plain unit test can check the deadline day exactly.
 - **Secrets stay out of Git.** Production database settings come from environment variables (`application-prod.properties`).
@@ -35,6 +37,5 @@ Then open http://localhost:8080. Tests: `./mvnw test`
 
 ## Roadmap
 - [ ] Per-person cost: split total ÷ people in + each costs, and a price-by-group-size table
-- [ ] Organizer-only edit link
 - [ ] Deploy (Render + Neon) and add the live link here
 - [ ] Settle up: fewest payments to square everyone up
