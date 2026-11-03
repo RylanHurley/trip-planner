@@ -105,12 +105,13 @@ public class GroupController {
                           @RequestParam(required = false) String org,
                           @RequestParam String name, @RequestParam BigDecimal amount,
                           @RequestParam SplitType splitType) {
+        BigDecimal val = new BigDecimal("10000");
         TripGroup group = groupRepository.findByInviteToken(token);
         if (group == null) { return "redirect:/"; }
         Trip trip = tripRepository.findById(tripId).orElse(null);
         if (trip == null || !trip.getTripGroup().getId().equals(group.getId())) { return "redirect:/g/" + token; }
         if (!group.isOrganizer(org)) { return "redirect:/g/" + token + "/trips/" + tripId; }
-        if (name.isBlank() || name.length() > 50 || amount.compareTo(BigDecimal.ZERO) <= 0) {
+        if (name.isBlank() || name.length() > 50 || amount.compareTo(BigDecimal.ZERO) <= 0 || amount.compareTo(val) > 0) {
             return "redirect:/g/" + token + "/trips/" + tripId + "?org=" + org;
         }
         CostItem cost = new CostItem();
