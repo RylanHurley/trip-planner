@@ -37,23 +37,25 @@ public class GroupController {
             TripGroup group = new TripGroup();
             group.setName(name);
             groupRepository.save(group);
-            return "redirect:/g/" + group.getInviteToken();
+            return "redirect:/g/" + group.getInviteToken() + "?org=" + group.getOrganizerToken();
         }
     }
 
     @GetMapping("/g/{token}")
-    public String showGroup(@PathVariable String token, Model model) {
+    public String showGroup(@PathVariable String token, @RequestParam(required = false) String org, Model model) {
         TripGroup group = groupRepository.findByInviteToken(token);
         if (group == null) {
             return "redirect:/";
         }
         model.addAttribute("group", group);
         model.addAttribute("trips", tripRepository.findByTripGroup(group));
+        addOrganizer(model, group, org);
         return "group";
     }
 
     @PostMapping("/g/{token}/trips")
     public String createTrip(@PathVariable String token,
+                             @RequestParam(required = false) String org,
                              @RequestParam String name,
                              @RequestParam LocalDate startDate,
                              @RequestParam LocalDate endDate,
@@ -63,11 +65,13 @@ public class GroupController {
         if (group == null) {
             return "redirect:/";
         }
-        if(endDate.isBefore(startDate)) {return "redirect:/g/" + token;}
+        if (!group.isOrganizer(org)) { return "redirect:/g/" + token; }
+        String back = "redirect:/g/" + token + "?org=" + org;
+        if(endDate.isBefore(startDate)) {return back;}
         if (name.isBlank() || name.length() > 50 || targetSize < 1 || commitDeadline.isAfter(startDate)) {
-            return "redirect:/g/" + token;
+            return back;
         }
-        if(startDate.isBefore(LocalDate.now())) {return "redirect:/g/" + token;}
+        if(startDate.isBefore(LocalDate.now())) {return back;}
         Trip trip = new Trip();
         trip.setName(name);
         trip.setStartDate(startDate);
@@ -76,11 +80,12 @@ public class GroupController {
         trip.setCommitDeadline(commitDeadline);
         trip.setTripGroup(group);
         tripRepository.save(trip);
-        return "redirect:/g/" + token;
+        return back;
     }
 
     @GetMapping("/g/{token}/trips/{tripId}")
-    public String showTrip(@PathVariable String token, @PathVariable Long tripId, Model model) {
+    public String showTrip(@PathVariable String token, @PathVariable Long tripId,
+                           @RequestParam(required = false) String org, Model model) {
         TripGroup group = groupRepository.findByInviteToken(token);
         if (group == null) { return "redirect:/"; }
         Trip trip = tripRepository.findById(tripId).orElse(null);
@@ -92,11 +97,13 @@ public class GroupController {
         model.addAttribute("participants", participants);
         model.addAttribute("commitOpen", trip.isCommitOpen(LocalDate.now()));
         model.addAttribute("tripOn", trip.isOn(participants.size()));
+        addOrganizer(model, group, org);
         return "trip";
     }
 
     @PostMapping("/g/{token}/trips/{tripId}/costs")
     public String addCost(@PathVariable String token, @PathVariable Long tripId,
+                          @RequestParam(required = false) String org,
                           @RequestParam String name, @RequestParam BigDecimal amount,
                           @RequestParam SplitType splitType) {
         BigDecimal val = new BigDecimal("10000");
@@ -104,8 +111,9 @@ public class GroupController {
         if (group == null) { return "redirect:/"; }
         Trip trip = tripRepository.findById(tripId).orElse(null);
         if (trip == null || !trip.getTripGroup().getId().equals(group.getId())) { return "redirect:/g/" + token; }
+        if (!group.isOrganizer(org)) { return "redirect:/g/" + token + "/trips/" + tripId; }
         if (name.isBlank() || name.length() > 50 || amount.compareTo(BigDecimal.ZERO) <= 0 || amount.compareTo(val) > 0) {
-            return "redirect:/g/" + token + "/trips/" + tripId;
+            return "redirect:/g/" + token + "/trips/" + tripId + "?org=" + org;
         }
         CostItem cost = new CostItem();
         cost.setName(name);
@@ -113,26 +121,34 @@ public class GroupController {
         cost.setSplitType(splitType);
         cost.setTrip(trip);
         costItemRepository.save(cost);
-        return "redirect:/g/" + token + "/trips/" + tripId;
+        return "redirect:/g/" + token + "/trips/" + tripId + "?org=" + org;
     }
 
     @PostMapping("/g/{token}/trips/{tripId}/join")
-    public String joinTrip(@PathVariable String token, @PathVariable Long tripId, @RequestParam String name) {
+    public String joinTrip(@PathVariable String token, @PathVariable Long tripId,
+                           @RequestParam(required = false) String org, @RequestParam String name) {
         TripGroup group = groupRepository.findByInviteToken(token);
         if (group == null) { return "redirect:/"; }
         Trip trip = tripRepository.findById(tripId).orElse(null);
         if (trip == null || !trip.getTripGroup().getId().equals(group.getId())) { return "redirect:/g/" + token; }
+        String back = "redirect:/g/" + token + "/trips/" + tripId + (group.isOrganizer(org) ? "?org=" + org : "");
         if (!trip.isCommitOpen(LocalDate.now())) {
-            return "redirect:/g/" + token + "/trips/" + tripId;
+            return back;
         }
         String trimmed = name.trim();
-        if (trimmed.length() > 30 || trimmed.isEmpty() || participantRepository.existsByTripAndNameIgnoreCase(trip, trimmed)) {
-            return "redirect:/g/" + token + "/trips/" + tripId;
+        if (trimmed.isEmpty() || participantRepository.existsByTripAndNameIgnoreCase(trip, trimmed)|| trimmed.length() > 30) {
+            return back;
         }
         Participant participant = new Participant();
         participant.setName(trimmed);
         participant.setTrip(trip);
         participantRepository.save(participant);
-        return "redirect:/g/" + token + "/trips/" + tripId;
+        return back;
+    }
+
+    private void addOrganizer(Model model, TripGroup group, String org) {
+        boolean isOrganizer = group.isOrganizer(org);
+        model.addAttribute("isOrganizer", isOrganizer);
+        model.addAttribute("orgQuery", isOrganizer ? "?org=" + org : "");
     }
 }

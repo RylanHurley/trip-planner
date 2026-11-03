@@ -10,20 +10,25 @@
 <h1 th:text="${group.name}">Group name</h1>
 <p>Share this link with your group:</p>
 <p><code th:text="'/g/' + ${group.inviteToken}">/g/token</code></p>
+<div th:if="${isOrganizer}">
+    <p>Your organizer link. Keep it private: it's the only way to add trips and costs.</p>
+    <p><code th:text="'/g/' + ${group.inviteToken} + '?org=' + ${group.organizerToken}">/g/token?org=...</code></p>
+</div>
 
 <h2>Trips</h2>
 <p th:if="${trips.isEmpty()}">No trips yet.</p>
 <ul>
     <li th:each="trip : ${trips}">
-        <a th:href="'/g/' + ${group.inviteToken} + '/trips/' + ${trip.id}" th:text="${trip.name}">Trip name</a>:
+        <a th:href="'/g/' + ${group.inviteToken} + '/trips/' + ${trip.id} + ${orgQuery}" th:text="${trip.name}">Trip name</a>:
         <span th:text="${trip.startDate}">start</span> to <span th:text="${trip.endDate}">end</span>,
         need <span th:text="${trip.targetSize}">0</span> people,
         commit by <span th:text="${trip.commitDeadline}">deadline</span>
     </li>
 </ul>
 
-<h2>Add a trip</h2>
-<form th:action="'/g/' + ${group.inviteToken} + '/trips'" method="post">
+<h2 th:if="${isOrganizer}">Add a trip</h2>
+<form th:if="${isOrganizer}" th:action="'/g/' + ${group.inviteToken} + '/trips'" method="post">
+    <input type="hidden" name="org" th:value="${group.organizerToken}">
     <label for="name">Trip name</label>
     <input id="name" name="name" type="text" required maxlength="50">
     <label for="startDate">Start date</label>

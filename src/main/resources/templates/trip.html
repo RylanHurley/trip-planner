@@ -8,6 +8,7 @@
 </head>
 <body>
 <h1 th:text="${trip.name}">Trip name</h1>
+<p th:if="${isOrganizer}"> You're the organizer </p>
 <p>
     <span th:text="${trip.startDate}">start</span> to <span th:text="${trip.endDate}">end</span>,
     need <span th:text="${trip.targetSize}">0</span> people,
@@ -23,6 +24,7 @@
     <li th:each="participant : ${participants}" th:text="${participant.name}">Name</li>
 </ul>
 <form th:if="${commitOpen}" th:action="'/g/' + ${group.inviteToken} + '/trips/' + ${trip.id} + '/join'" method="post">
+    <input th:if="${isOrganizer}" type="hidden" name="org" th:value="${group.organizerToken}">
     <label for="participantName">Your name</label>
     <input id="participantName" name="name" type="text" required maxlength="30">
     <button type="submit">I'm in</button>
@@ -39,8 +41,9 @@
     </li>
 </ul>
 
-<h2>Add a cost</h2>
-<form th:action="'/g/' + ${group.inviteToken} + '/trips/' + ${trip.id} + '/costs'" method="post">
+<h2 th:if="${isOrganizer}">Add a cost</h2>
+<form th:if="${isOrganizer}" th:action="'/g/' + ${group.inviteToken} + '/trips/' + ${trip.id} + '/costs'" method="post">
+    <input type="hidden" name="org" th:value="${group.organizerToken}">
     <label for="name">What is it</label>
     <input id="name" name="name" type="text" required maxlength="50">
     <label for="amount">Amount ($)</label>
@@ -53,6 +56,6 @@
     <button type="submit">Add cost</button>
 </form>
 
-<a class="back" th:href="'/g/' + ${group.inviteToken}">Back to group</a>
+<a class="back" th:href="'/g/' + ${group.inviteToken} + ${orgQuery}">Back to group</a>
 </body>
 </html>
