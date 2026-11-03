@@ -13,11 +13,14 @@ public class GroupController {
     private final TripGroupRepository groupRepository;
     private final TripRepository tripRepository;
     private final CostItemRepository costItemRepository;
+    private final ParticipantRepository participantRepository;
 
-    public GroupController(TripGroupRepository groupRepository, TripRepository tripRepository, CostItemRepository costItemRepository) {
+    public GroupController(TripGroupRepository groupRepository, TripRepository tripRepository,
+                           CostItemRepository costItemRepository, ParticipantRepository participantRepository) {
         this.groupRepository = groupRepository;
         this.tripRepository = tripRepository;
         this.costItemRepository = costItemRepository;
+        this.participantRepository = participantRepository;
     }
 
     @GetMapping("/groups/new")
@@ -80,6 +83,7 @@ public class GroupController {
         model.addAttribute("group", group);
         model.addAttribute("trip", trip);
         model.addAttribute("costs", costItemRepository.findByTrip(trip));
+        model.addAttribute("participants", participantRepository.findByTrip(trip));
         return "trip";
     }
 
@@ -101,6 +105,23 @@ public class GroupController {
         cost.setSplitType(splitType);
         cost.setTrip(trip);
         costItemRepository.save(cost);
+        return "redirect:/g/" + token + "/trips/" + tripId;
+    }
+
+    @PostMapping("/g/{token}/trips/{tripId}/join")
+    public String joinTrip(@PathVariable String token, @PathVariable Long tripId, @RequestParam String name) {
+        TripGroup group = groupRepository.findByInviteToken(token);
+        if (group == null) { return "redirect:/"; }
+        Trip trip = tripRepository.findById(tripId).orElse(null);
+        if (trip == null || !trip.getTripGroup().getId().equals(group.getId())) { return "redirect:/g/" + token; }
+        String trimmed = name.trim();
+        if (trimmed.length() > 30 || trimmed.isEmpty() || participantRepository.existsByTripAndNameIgnoreCase(trip, trimmed)) {
+            return "redirect:/g/" + token + "/trips/" + tripId;
+        }
+        Participant participant = new Participant();
+        participant.setName(trimmed);
+        participant.setTrip(trip);
+        participantRepository.save(participant);
         return "redirect:/g/" + token + "/trips/" + tripId;
     }
 }

@@ -13,6 +13,17 @@
     commit by <span th:text="${trip.commitDeadline}">deadline</span>
 </p>
 
+<h2>Who's in</h2>
+<p><span th:text="${participants.size()}">0</span> of <span th:text="${trip.targetSize}">0</span> in</p>
+<ul>
+    <li th:each="participant : ${participants}" th:text="${participant.name}">Name</li>
+</ul>
+<form th:action="'/g/' + ${group.inviteToken} + '/trips/' + ${trip.id} + '/join'" method="post">
+    <label for="participantName">Your name</label>
+    <input id="participantName" name="name" type="text" required maxlength="30">
+    <button type="submit">I'm in</button>
+</form>
+
 <h2>Costs</h2>
 <p th:if="${costs.isEmpty()}">No costs yet.</p>
 <ul>
