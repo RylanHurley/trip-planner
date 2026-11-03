@@ -5,6 +5,7 @@ import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class TripTest {
 
@@ -26,5 +27,12 @@ class TripTest {
         assertFalse(trip.isOn(5));
         assertTrue(trip.isOn(6));
         assertTrue(trip.isOn(7));
+    }
+    @Test
+    void spotsLeftNeverGoesNegative(){
+        Trip trip = new Trip();
+        trip.setTargetSize(6);
+        assertEquals(2,trip.spotsLeft(4));
+        assertEquals(0,trip.spotsLeft(8));
     }
 }

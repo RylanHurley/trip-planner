@@ -71,6 +71,7 @@ public class GroupController {
         if (name.isBlank() || name.length() > 50 || targetSize < 1 || commitDeadline.isAfter(startDate)) {
             return back;
         }
+        if(startDate.isBefore(LocalDate.now())) {return back;}
         Trip trip = new Trip();
         trip.setName(name);
         trip.setStartDate(startDate);
@@ -135,7 +136,7 @@ public class GroupController {
             return back;
         }
         String trimmed = name.trim();
-        if (trimmed.isEmpty() || participantRepository.existsByTripAndNameIgnoreCase(trip, trimmed)) {
+        if (trimmed.isEmpty() || participantRepository.existsByTripAndNameIgnoreCase(trip, trimmed)|| trimmed.length() > 30) {
             return back;
         }
         Participant participant = new Participant();
