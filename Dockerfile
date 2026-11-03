@@ -1,4 +1,4 @@
-# Stage 1: build the jar with Maven
+# Stage 1: Builds app into one file
 FROM eclipse-temurin:21-jdk AS build
 WORKDIR /app
 COPY .mvn .mvn
@@ -7,7 +7,7 @@ RUN chmod +x mvnw && ./mvnw -q dependency:go-offline
 COPY src src
 RUN ./mvnw -q package -DskipTests
 
-# Stage 2: run the jar on a small Java runtime image
+# Stage 2: render runs the built app
 FROM eclipse-temurin:21-jre
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
