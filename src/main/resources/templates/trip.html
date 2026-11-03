@@ -15,10 +15,13 @@
 
 <h2>Who's in</h2>
 <p><span th:text="${participants.size()}">0</span> of <span th:text="${trip.targetSize}">0</span> in</p>
+<p th:if="${tripOn}"><strong>The trip is on!</strong></p>
+<p th:if="${!tripOn and !commitOpen}"><strong>Commits closed. Didn't hit the target.</strong></p>
+<p th:if="${!tripOn and commitOpen}">Commit by <span th:text="${trip.commitDeadline}">deadline</span>.</p>
 <ul>
     <li th:each="participant : ${participants}" th:text="${participant.name}">Name</li>
 </ul>
-<form th:action="'/g/' + ${group.inviteToken} + '/trips/' + ${trip.id} + '/join'" method="post">
+<form th:if="${commitOpen}" th:action="'/g/' + ${group.inviteToken} + '/trips/' + ${trip.id} + '/join'" method="post">
     <label for="participantName">Your name</label>
     <input id="participantName" name="name" type="text" required maxlength="30">
     <button type="submit">I'm in</button>

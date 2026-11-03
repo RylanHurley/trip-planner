@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 @Controller
 public class GroupController {
     private final TripGroupRepository groupRepository;
@@ -83,7 +84,10 @@ public class GroupController {
         model.addAttribute("group", group);
         model.addAttribute("trip", trip);
         model.addAttribute("costs", costItemRepository.findByTrip(trip));
-        model.addAttribute("participants", participantRepository.findByTrip(trip));
+        List<Participant> participants = participantRepository.findByTrip(trip);
+        model.addAttribute("participants", participants);
+        model.addAttribute("commitOpen", trip.isCommitOpen(LocalDate.now()));
+        model.addAttribute("tripOn", trip.isOn(participants.size()));
         return "trip";
     }
 
@@ -114,6 +118,9 @@ public class GroupController {
         if (group == null) { return "redirect:/"; }
         Trip trip = tripRepository.findById(tripId).orElse(null);
         if (trip == null || !trip.getTripGroup().getId().equals(group.getId())) { return "redirect:/g/" + token; }
+        if (!trip.isCommitOpen(LocalDate.now())) {
+            return "redirect:/g/" + token + "/trips/" + tripId;
+        }
         String trimmed = name.trim();
         if (trimmed.length() > 30 || trimmed.isEmpty() || participantRepository.existsByTripAndNameIgnoreCase(trip, trimmed)) {
             return "redirect:/g/" + token + "/trips/" + tripId;
