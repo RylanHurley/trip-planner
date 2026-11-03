@@ -8,6 +8,7 @@
 </head>
 <body>
 <h1 th:text="${trip.name}">Trip name</h1>
+<p th:if="${isOrganizer}"> You're the organizer </p>
 <p>
     <span th:text="${trip.startDate}">start</span> to <span th:text="${trip.endDate}">end</span>,
     need <span th:text="${trip.targetSize}">0</span> people,
