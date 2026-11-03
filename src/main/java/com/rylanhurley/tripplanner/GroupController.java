@@ -31,7 +31,7 @@ public class GroupController {
 
     @PostMapping("/groups")
     public String createGroup(@RequestParam String name) {
-        if (name.isBlank()) {
+        if (name.isBlank() || name.length() > 50) {
             return "redirect:/groups/new";
         } else {
             TripGroup group = new TripGroup();
@@ -64,6 +64,10 @@ public class GroupController {
             return "redirect:/";
         }
         if(endDate.isBefore(startDate)) {return "redirect:/g/" + token;}
+        if (name.isBlank() || name.length() > 50 || targetSize < 1 || commitDeadline.isAfter(startDate)) {
+            return "redirect:/g/" + token;
+        }
+        if(startDate.isBefore(LocalDate.now())) {return "redirect:/g/" + token;}
         Trip trip = new Trip();
         trip.setName(name);
         trip.setStartDate(startDate);
@@ -100,7 +104,7 @@ public class GroupController {
         if (group == null) { return "redirect:/"; }
         Trip trip = tripRepository.findById(tripId).orElse(null);
         if (trip == null || !trip.getTripGroup().getId().equals(group.getId())) { return "redirect:/g/" + token; }
-        if (name.isBlank() || amount.compareTo(BigDecimal.ZERO) <= 0 || amount.compareTo(val) > 0) {
+        if (name.isBlank() || name.length() > 50 || amount.compareTo(BigDecimal.ZERO) <= 0 || amount.compareTo(val) > 0) {
             return "redirect:/g/" + token + "/trips/" + tripId;
         }
         CostItem cost = new CostItem();
