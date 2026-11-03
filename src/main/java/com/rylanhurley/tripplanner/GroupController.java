@@ -8,7 +8,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 @Controller
 public class GroupController {
     private final TripGroupRepository groupRepository;
@@ -92,11 +94,21 @@ public class GroupController {
         if (trip == null || !trip.getTripGroup().getId().equals(group.getId())) { return "redirect:/g/" + token; }
         model.addAttribute("group", group);
         model.addAttribute("trip", trip);
-        model.addAttribute("costs", costItemRepository.findByTrip(trip));
+        List<CostItem> costs = costItemRepository.findByTrip(trip);
+        model.addAttribute("costs", costs);
         List<Participant> participants = participantRepository.findByTrip(trip);
         model.addAttribute("participants", participants);
         model.addAttribute("commitOpen", trip.isCommitOpen(LocalDate.now()));
         model.addAttribute("tripOn", trip.isOn(participants.size()));
+        model.addAttribute("perPersonAtTarget", CostCalculator.perPerson(costs, trip.getTargetSize()));
+        if (!participants.isEmpty()) {
+            model.addAttribute("perPersonNow", CostCalculator.perPerson(costs, participants.size()));
+        }
+        Map<Integer, BigDecimal> priceTable = new LinkedHashMap<>();
+        for (int people = 2; people <= trip.getTargetSize() + 2; people++) {
+            priceTable.put(people, CostCalculator.perPerson(costs, people));
+        }
+        model.addAttribute("priceTable", priceTable);
         addOrganizer(model, group, org);
         return "trip";
     }
