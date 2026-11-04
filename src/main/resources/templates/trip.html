@@ -47,10 +47,14 @@
 <table class="price-table">
     <thead><tr><th>People</th><th>Each pays</th></tr></thead>
     <tbody>
-    <tr th:each="row : ${priceTable}" th:classappend="${row.key == trip.targetSize} ? 'target-row'">
+    <tr th:each="row : ${priceTable}" th:classappend="${row.key == trip.targetSize or row.key==participants.size()} ? 'target-row'">
         <td th:text="${row.key}">2</td>
         <td>$<span th:text="${row.value}">0.00</span></td>
     </tr>
+
+
+
+
     </tbody>
 </table>
 

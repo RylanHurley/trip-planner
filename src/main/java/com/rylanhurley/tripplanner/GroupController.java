@@ -105,7 +105,7 @@ public class GroupController {
             model.addAttribute("perPersonNow", CostCalculator.perPerson(costs, participants.size()));
         }
         Map<Integer, BigDecimal> priceTable = new LinkedHashMap<>();
-        for (int people = 2; people <= trip.getTargetSize() + 2; people++) {
+        for (int people = 1; people <= trip.getTargetSize() + 2; people++) {
             priceTable.put(people, CostCalculator.perPerson(costs, people));
         }
         model.addAttribute("priceTable", priceTable);
