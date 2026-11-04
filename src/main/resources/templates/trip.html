@@ -41,6 +41,23 @@
     </li>
 </ul>
 
+<h2>What you'd pay</h2>
+<p>Per person at the target size (<span th:text="${trip.targetSize}">0</span>): <strong>$<span th:text="${perPersonAtTarget}">0.00</span></strong></p>
+<p th:if="${perPersonNow != null}">Per person with who's in now (<span th:text="${participants.size()}">0</span>): <strong>$<span th:text="${perPersonNow}">0.00</span></strong></p>
+<table class="price-table">
+    <thead><tr><th>People</th><th>Each pays</th></tr></thead>
+    <tbody>
+    <tr th:each="row : ${priceTable}" th:classappend="${row.key == trip.targetSize or row.key==participants.size()} ? 'target-row'">
+        <td th:text="${row.key}">2</td>
+        <td>$<span th:text="${row.value}">0.00</span></td>
+    </tr>
+
+
+
+
+    </tbody>
+</table>
+
 <h2 th:if="${isOrganizer}">Add a cost</h2>
 <form th:if="${isOrganizer}" th:action="'/g/' + ${group.inviteToken} + '/trips/' + ${trip.id} + '/costs'" method="post">
     <input type="hidden" name="org" th:value="${group.organizerToken}">

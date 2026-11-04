@@ -126,3 +126,19 @@ button:hover,
 }
 h1 { font-size: 1.5rem; }                         /* phones: default */
 @media (min-width: 600px) { h1 { font-size: 2.25rem; } }  /* wide screens only */
+
+.price-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 8px 0 16px;
+}
+.price-table th,
+.price-table td {
+    text-align: left;
+    padding: 8px;
+    border-bottom: 1px solid #e5e7eb;
+}
+.price-table .target-row {
+    font-weight: 700;
+    background: #f0fdf4;
+}
