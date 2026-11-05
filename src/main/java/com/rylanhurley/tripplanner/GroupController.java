@@ -130,7 +130,7 @@ public class GroupController {
             return "redirect:/g/" + token + "/trips/" + tripId + "?org=" + org;
         }
         boolean hasLink = link != null && !link.isBlank();
-        if (hasLink && (!link.startsWith("https://")||link.length() >=255)) {
+        if (hasLink && (!link.startsWith("https://") || link.length() > 255)) {
             return "redirect:/g/" + token + "/trips/" + tripId + "?org=" + org;
         }
 
@@ -140,6 +140,37 @@ public class GroupController {
         cost.setAmount(amount);
         cost.setSplitType(splitType);
         cost.setTrip(trip);
+        costItemRepository.save(cost);
+        return "redirect:/g/" + token + "/trips/" + tripId + "?org=" + org;
+    }
+
+    @PostMapping("/g/{token}/trips/{tripId}/costs/{costId}")
+    public String updateCost(@PathVariable String token, @PathVariable Long tripId, @PathVariable Long costId,
+                             @RequestParam(required = false) String org,
+                             @RequestParam String name, @RequestParam BigDecimal amount,
+                             @RequestParam SplitType splitType,
+                             @RequestParam(required = false) String link) {
+        BigDecimal val = new BigDecimal("10000");
+        TripGroup group = groupRepository.findByInviteToken(token);
+        if (group == null) { return "redirect:/"; }
+        Trip trip = tripRepository.findById(tripId).orElse(null);
+        if (trip == null || !trip.getTripGroup().getId().equals(group.getId())) { return "redirect:/g/" + token; }
+        if (!group.isOrganizer(org)) { return "redirect:/g/" + token + "/trips/" + tripId; }
+        CostItem cost = costItemRepository.findById(costId).orElse(null);
+        if (cost == null || !cost.getTrip().getId().equals(trip.getId())) {
+            return "redirect:/g/" + token + "/trips/" + tripId + "?org=" + org;
+        }
+        if (name.isBlank() || name.length() > 50 || amount.compareTo(BigDecimal.ZERO) <= 0 || amount.compareTo(val) > 0) {
+            return "redirect:/g/" + token + "/trips/" + tripId + "?org=" + org;
+        }
+        boolean hasLink = link != null && !link.isBlank();
+        if (hasLink && (!link.startsWith("https://") || link.length() > 255)) {
+            return "redirect:/g/" + token + "/trips/" + tripId + "?org=" + org;
+        }
+        cost.setName(name);
+        cost.setAmount(amount);
+        cost.setSplitType(splitType);
+        cost.setLink(hasLink ? link : null);
         costItemRepository.save(cost);
         return "redirect:/g/" + token + "/trips/" + tripId + "?org=" + org;
     }

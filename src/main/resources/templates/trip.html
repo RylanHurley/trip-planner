@@ -68,8 +68,25 @@
         <div class="cost-note small muted">
             <span th:if="${cost.splitType.name() == 'SPLIT'}">Split between everyone</span>
             <span th:if="${cost.splitType.name() == 'EACH'}">Per person</span>
-            <a th:if="${cost.link != null}" th:href="${cost.link}" target="_blank" rel="noopener noreferrer">Pay / buy</a>
-        </div>
+            <a th:if="${cost.link != null}" th:href="${cost.link}" target="_blank" rel="noopener noreferrer">Open Link</a>
+        </div>        <details th:if="${isOrganizer}" class="edit-cost">
+        <summary class="small">Edit</summary>
+        <form th:action="'/g/' + ${group.inviteToken} + '/trips/' + ${trip.id} + '/costs/' + ${cost.id}" method="post">
+            <input type="hidden" name="org" th:value="${group.organizerToken}">
+            <label th:for="'name-' + ${cost.id}">What is it</label>
+            <input th:id="'name-' + ${cost.id}" name="name" type="text" required maxlength="50" th:value="${cost.name}">
+            <label th:for="'amount-' + ${cost.id}">Amount ($)</label>
+            <input th:id="'amount-' + ${cost.id}" name="amount" type="number" min="0.01" step="0.01" required th:value="${cost.amount}">
+            <label th:for="'split-' + ${cost.id}">How it's paid</label>
+            <select th:id="'split-' + ${cost.id}" name="splitType">
+                <option value="SPLIT" th:selected="${cost.splitType.name() == 'SPLIT'}">Split the total between everyone</option>
+                <option value="EACH" th:selected="${cost.splitType.name() == 'EACH'}">Everyone pays this amount</option>
+            </select>
+            <label th:for="'link-' + ${cost.id}">Pay or buy link (optional)</label>
+            <input th:id="'link-' + ${cost.id}" name="link" type="url" maxlength="255" th:value="${cost.link}">
+            <button type="submit">Save changes</button>
+        </form>
+    </details>
     </li>
 </ul>
 
