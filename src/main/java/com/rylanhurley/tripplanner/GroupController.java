@@ -38,6 +38,7 @@ public class GroupController {
         } else {
             TripGroup group = new TripGroup();
             group.setName(name);
+            group.setInviteToken(TripGroup.makeInviteToken(name));
             groupRepository.save(group);
             return "redirect:/g/" + group.getInviteToken() + "?org=" + group.getOrganizerToken();
         }

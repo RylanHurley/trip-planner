@@ -16,4 +16,14 @@ class TripGroupTest {
         assertFalse(group.isOrganizer(null));
         assertNotEquals(group.getInviteToken(), group.getOrganizerToken());
     }
+    @Test
+    void inviteTokenStartsWithTheCleanName() {
+        String token = TripGroup.makeInviteToken("Colorado Crew!");
+        assertTrue(token.startsWith("colorado-crew-"));
+    }
+    @Test
+    void nameWithNoLettersStillGetsALink() {
+        String token = TripGroup.makeInviteToken("!!!");
+        assertTrue(token.startsWith("trip-"));
+    }
 }

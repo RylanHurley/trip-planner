@@ -45,6 +45,20 @@ public class TripGroup {
     public boolean isOrganizer(String org) {
         return organizerToken.equals(org);
     }
+    public static String makeInviteToken(String name) {
+        String slug = name.toLowerCase().replaceAll("[^a-z0-9]+", "-").replaceAll("^-|-$", "");
+        if (slug.isEmpty()) {
+            slug = "trip";
+        }
+        if (slug.length() > 30) {
+            slug = slug.substring(0, 30);
+        }
+        String random = UUID.randomUUID().toString().replace("-", "").substring(0, 16);
+        return slug+"-"+random;
+    }
 
+    public void setInviteToken(String inviteToken) {
+        this.inviteToken = inviteToken;
+    }
 
 }
