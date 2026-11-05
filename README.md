@@ -36,6 +36,7 @@ Java 21 · Spring Boot · Spring MVC + Thymeleaf · Spring Data JPA / Hibernate 
 Then open http://localhost:8080. Tests: `./mvnw test`
 
 ## Roadmap
-- [ ] Per-person cost: split total ÷ people in + each costs, and a price-by-group-size table
+- [x] Per-person cost: split total ÷ people in + each costs, and a price-by-group-size table
 - [x] Deploy (Render + Neon) and add the live link here
 - [ ] Settle up: fewest payments to square everyone up
+- [ ] Links on costs (Airbnb, tickets) so people can pay what's needed
