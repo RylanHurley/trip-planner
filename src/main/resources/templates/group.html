@@ -9,10 +9,10 @@
 <body>
 <h1 th:text="${group.name}">Group name</h1>
 <p>Share this link with your group:</p>
-<p><code th:text="'/g/' + ${group.inviteToken}">/g/token</code></p>
+<p><code class="full-link" th:text="'/g/' + ${group.inviteToken}">/g/token</code> <button type="button" class="copy-link">Copy link</button></p>
 <div th:if="${isOrganizer}">
     <p>Your organizer link. Keep it private: it's the only way to add trips and costs.</p>
-    <p><code th:text="'/g/' + ${group.inviteToken} + '?org=' + ${group.organizerToken}">/g/token?org=...</code></p>
+    <p><code class="full-link" th:text="'/g/' + ${group.inviteToken} + '?org=' + ${group.organizerToken}">/g/token?org=...</code> <button type="button" class="copy-link">Copy link</button></p>
 </div>
 
 <h2>Trips</h2>
@@ -36,6 +36,15 @@
         const spot = document.querySelector('[data-trip-id="' + trip.id + '"]');
         spot.textContent = trip.peopleIn + "/" + trip.targetSize;
       }
+    });
+</script>
+<script>
+    document.querySelectorAll(".full-link").forEach((code) => {
+      code.textContent = window.location.origin + code.textContent;
+      code.parentElement.querySelector(".copy-link").addEventListener("click", async (event) => {
+        await navigator.clipboard.writeText(code.textContent);
+        event.target.textContent = "Copied!";
+      });
     });
 </script>
 <h2 th:if="${isOrganizer}">Add a trip</h2>
