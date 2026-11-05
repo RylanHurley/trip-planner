@@ -23,9 +23,21 @@
         <span th:text="${trip.startDate}">start</span> to <span th:text="${trip.endDate}">end</span>,
         need <span th:text="${trip.targetSize}">0</span> people,
         commit by <span th:text="${trip.commitDeadline}">deadline</span>
+        <strong th:attr="data-trip-id=${trip.id}"></strong>
     </li>
 </ul>
-
+<button id="refresh" th:attr="data-token=${group.inviteToken}">Refresh who's in</button>
+<script>
+    document.getElementById("refresh").addEventListener("click", async () => {
+      const token = document.getElementById("refresh").dataset.token;
+      const res = await fetch("/api/groups/" + token + "/trips");
+      const trips = await res.json();
+      for (const trip of trips) {
+        const spot = document.querySelector('[data-trip-id="' + trip.id + '"]');
+        spot.textContent = trip.peopleIn + "/" + trip.targetSize;
+      }
+    });
+</script>
 <h2 th:if="${isOrganizer}">Add a trip</h2>
 <form th:if="${isOrganizer}" th:action="'/g/' + ${group.inviteToken} + '/trips'" method="post">
     <input type="hidden" name="org" th:value="${group.organizerToken}">
