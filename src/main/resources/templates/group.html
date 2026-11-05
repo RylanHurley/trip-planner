@@ -7,26 +7,41 @@
     <title th:text="${group.name}">Group</title>
 </head>
 <body>
+<header class="brand"><a href="/">Trip Planner</a></header>
 <h1 th:text="${group.name}">Group name</h1>
-<p>Share this link with your group:</p>
-<p><code class="full-link" th:text="'/g/' + ${group.inviteToken}">/g/token</code> <button type="button" class="copy-link">Copy link</button></p>
-<div th:if="${isOrganizer}">
-    <p>Your organizer link. Keep it private: it's the only way to add trips and costs.</p>
-    <p><code class="full-link" th:text="'/g/' + ${group.inviteToken} + '?org=' + ${group.organizerToken}">/g/token?org=...</code> <button type="button" class="copy-link">Copy link</button></p>
+
+<div class="card">
+    <strong>Share this link with your group</strong>
+    <div class="link-row">
+        <code class="full-link" th:text="'/g/' + ${group.inviteToken}">/g/token</code>
+        <button type="button" class="copy-link secondary">Copy link</button>
+    </div>
 </div>
+<details class="card" th:if="${isOrganizer}">
+    <summary>Your organizer link (keep it private)</summary>
+    <p class="small muted">It's the only way to add trips and costs, and it can't be recovered. Don't share it.</p>
+    <div class="link-row">
+        <code class="full-link" th:text="'/g/' + ${group.inviteToken} + '?org=' + ${group.organizerToken}">/g/token?org=...</code>
+        <button type="button" class="copy-link secondary">Copy link</button>
+    </div>
+</details>
 
 <h2>Trips</h2>
-<p th:if="${trips.isEmpty()}">No trips yet.</p>
+<p class="muted" th:if="${trips.isEmpty()}">No trips yet.</p>
 <ul>
     <li th:each="trip : ${trips}">
-        <a th:href="'/g/' + ${group.inviteToken} + '/trips/' + ${trip.id} + ${orgQuery}" th:text="${trip.name}">Trip name</a>:
-        <span th:text="${trip.startDate}">start</span> to <span th:text="${trip.endDate}">end</span>,
-        need <span th:text="${trip.targetSize}">0</span> people,
-        commit by <span th:text="${trip.commitDeadline}">deadline</span>
-        <strong th:attr="data-trip-id=${trip.id}"></strong>
+        <div class="trip-row">
+            <a class="trip-name" th:href="'/g/' + ${group.inviteToken} + '/trips/' + ${trip.id} + ${orgQuery}" th:text="${trip.name}">Trip name</a>
+            <strong class="count" th:attr="data-trip-id=${trip.id}"></strong>
+        </div>
+        <p class="small muted">
+            <span th:text="${#temporals.format(trip.startDate, 'MMM d')}">start</span> to
+            <span th:text="${#temporals.format(trip.endDate, 'MMM d, yyyy')}">end</span>,
+            commit by <span th:text="${#temporals.format(trip.commitDeadline, 'MMM d')}">deadline</span>
+        </p>
     </li>
 </ul>
-<button id="refresh" th:attr="data-token=${group.inviteToken}">Refresh who's in</button>
+<button id="refresh" class="secondary" th:attr="data-token=${group.inviteToken}">Refresh who's in</button>
 <script>
     document.getElementById("refresh").addEventListener("click", async () => {
       const token = document.getElementById("refresh").dataset.token;
@@ -37,6 +52,7 @@
         spot.textContent = trip.peopleIn + "/" + trip.targetSize;
       }
     });
+    document.getElementById("refresh").click();
 </script>
 <script>
     document.querySelectorAll(".full-link").forEach((code) => {
@@ -47,6 +63,7 @@
       });
     });
 </script>
+
 <h2 th:if="${isOrganizer}">Add a trip</h2>
 <form th:if="${isOrganizer}" th:action="'/g/' + ${group.inviteToken} + '/trips'" method="post">
     <input type="hidden" name="org" th:value="${group.organizerToken}">
@@ -62,7 +79,5 @@
     <input id="commitDeadline" name="commitDeadline" type="date" required>
     <button type="submit">Add trip</button>
 </form>
-
-<a class="back" href="/">Back to home</a>
 </body>
 </html>

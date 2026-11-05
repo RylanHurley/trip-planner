@@ -7,22 +7,27 @@
     <title th:text="${trip.name}">Trip</title>
 </head>
 <body>
+<header class="brand"><a th:href="'/g/' + ${group.inviteToken} + ${orgQuery}" th:text="${group.name}">Group</a></header>
 <h1 th:text="${trip.name}">Trip name</h1>
-<p th:if="${isOrganizer}"> You're the organizer </p>
-<p>
-    <span th:text="${trip.startDate}">start</span> to <span th:text="${trip.endDate}">end</span>,
-    need <span th:text="${trip.targetSize}">0</span> people,
-    commit by <span th:text="${trip.commitDeadline}">deadline</span>
+<p class="muted">
+    <span th:text="${#temporals.format(trip.startDate, 'MMM d')}">start</span> to
+    <span th:text="${#temporals.format(trip.endDate, 'MMM d, yyyy')}">end</span>
 </p>
+<div class="pills">
+    <span th:if="${tripOn}" class="pill on">The trip is on!</span>
+    <span th:if="${!tripOn and !commitOpen}" class="pill closed">Commits closed. Didn't hit the target.</span>
+    <span th:if="${!tripOn and commitOpen}" class="pill open">Commit by <span th:text="${#temporals.format(trip.commitDeadline, 'MMM d')}">deadline</span></span>
+    <span th:if="${isOrganizer}" class="pill org">You're the organizer</span>
+</div>
 
 <h2>Who's in</h2>
-<p><span th:text="${participants.size()}">0</span> of <span th:text="${trip.targetSize}">0</span> in</p>
-<p th:if="${tripOn}" class="status-on"><strong>The trip is on!</strong></p>
-<p th:if="${!tripOn and !commitOpen}" class="status-closed"><strong>Commits closed. Didn't hit the target.</strong></p>
-<p th:if="${!tripOn and commitOpen}">Commit by <span th:text="${trip.commitDeadline}">deadline</span>.</p>
-<ul>
-    <li th:each="participant : ${participants}" th:text="${participant.name}">Name</li>
-</ul>
+<div class="card">
+    <strong><span th:text="${participants.size()}">0</span> of <span th:text="${trip.targetSize}">0</span> in</strong>
+    <progress th:attr="value=${participants.size()},max=${trip.targetSize}"></progress>
+    <ul class="names" th:if="${!participants.isEmpty()}">
+        <li th:each="participant : ${participants}" th:text="${participant.name}">Name</li>
+    </ul>
+</div>
 <form th:if="${commitOpen}" th:action="'/g/' + ${group.inviteToken} + '/trips/' + ${trip.id} + '/join'" method="post">
     <input th:if="${isOrganizer}" type="hidden" name="org" th:value="${group.organizerToken}">
     <label for="participantName">Your name</label>
@@ -30,34 +35,40 @@
     <button type="submit">I'm in</button>
 </form>
 
+<h2>What you'd pay</h2>
+<div class="card pay-card">
+    <p class="muted small">Each person, if <span th:text="${trip.targetSize}">0</span> people come</p>
+    <p class="pay-big">$<span th:text="${perPersonAtTarget}">0.00</span></p>
+    <p class="small" th:if="${perPersonNow != null}">With the <span th:text="${participants.size()}">0</span> in now: <strong>$<span th:text="${perPersonNow}">0.00</span></strong></p>
+</div>
+<details class="card">
+    <summary>See the price at every group size</summary>
+    <table class="price-table">
+        <thead><tr><th>People</th><th>Each pays</th></tr></thead>
+        <tbody>
+        <tr th:each="row : ${priceTable}" th:classappend="${row.key == trip.targetSize or row.key==participants.size()} ? 'target-row'">
+            <td th:text="${row.key}">2</td>
+            <td>$<span th:text="${row.value}">0.00</span></td>
+        </tr>
+        </tbody>
+    </table>
+</details>
+
 <h2>Costs</h2>
-<p th:if="${costs.isEmpty()}">No costs yet.</p>
+<p class="muted" th:if="${costs.isEmpty()}">No costs yet.</p>
 <ul>
     <li th:each="cost : ${costs}">
-        <span th:text="${cost.name}">Cost name</span>:
-        $<span th:text="${cost.amount}">0.00</span>
-        <span th:if="${cost.splitType.name() == 'SPLIT'}">split between everyone</span>
-        <span th:if="${cost.splitType.name() == 'EACH'}">per person</span>
-        <a th:if="${cost.link != null}" th:href="${cost.link}" target="_blank" rel="noopener noreferrer">Pay / buy</a>
+        <div class="cost-row">
+            <span th:text="${cost.name}">Cost name</span>
+            <span>$<span th:text="${cost.amount}">0.00</span></span>
+        </div>
+        <div class="cost-note small muted">
+            <span th:if="${cost.splitType.name() == 'SPLIT'}">Split between everyone</span>
+            <span th:if="${cost.splitType.name() == 'EACH'}">Per person</span>
+            <a th:if="${cost.link != null}" th:href="${cost.link}" target="_blank" rel="noopener noreferrer">Pay / buy</a>
+        </div>
     </li>
 </ul>
-
-<h2>What you'd pay</h2>
-<p>Per person at the target size (<span th:text="${trip.targetSize}">0</span>): <strong>$<span th:text="${perPersonAtTarget}">0.00</span></strong></p>
-<p th:if="${perPersonNow != null}">Per person with who's in now (<span th:text="${participants.size()}">0</span>): <strong>$<span th:text="${perPersonNow}">0.00</span></strong></p>
-<table class="price-table">
-    <thead><tr><th>People</th><th>Each pays</th></tr></thead>
-    <tbody>
-    <tr th:each="row : ${priceTable}" th:classappend="${row.key == trip.targetSize or row.key==participants.size()} ? 'target-row'">
-        <td th:text="${row.key}">2</td>
-        <td>$<span th:text="${row.value}">0.00</span></td>
-    </tr>
-
-
-
-
-    </tbody>
-</table>
 
 <h2 th:if="${isOrganizer}">Add a cost</h2>
 <form th:if="${isOrganizer}" th:action="'/g/' + ${group.inviteToken} + '/trips/' + ${trip.id} + '/costs'" method="post">

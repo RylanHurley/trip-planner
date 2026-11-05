@@ -7,10 +7,12 @@
     <title>New group</title>
 </head>
 <body>
+<header class="brand"><a href="/">Trip Planner</a></header>
 <h1>Create a group</h1>
+<p class="lead">Name it after your crew. You'll get a link to share.</p>
 <form action="/groups" method="post">
     <label for="name">Group name</label>
-    <input id="name" name="name" type="text" required maxlength="50">
+    <input id="name" name="name" type="text" required maxlength="50" placeholder="Colorado crew">
     <button type="submit">Create group</button>
 </form>
 <a class="back" href="/">Back to home</a>
