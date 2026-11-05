@@ -1,144 +1,235 @@
-/* Mobile first: one column, big tap targets */
+/* Trip Planner: quiet, typographic, one accent color. Mobile first. */
 :root {
-    --bg: #f6f7f9;
-    --card: #ffffff;
-    --text: #1d2330;
-    --muted: #5b6475;
-    --accent: #16a34a;
-    --accent-dark: #15803d;
-    --good: #15803d;
-    --bad: #b91c1c;
-    --border: #dde1e8;
+    color-scheme: light dark;
+    --bg: #f5f5f7;
+    --surface: #ffffff;
+    --field: #f5f5f7;
+    --text: #1d1d1f;
+    --secondary: #6e6e73;
+    --hairline: rgba(0, 0, 0, 0.09);
+    --accent: #0071e3;
+    --button: #0071e3;
+    --button-hover: #0077ed;
+    --on-accent: #ffffff;
+    --good: #1d7d3f;
+    --bad: #c4291c;
+    --bar: rgba(245, 245, 247, 0.72);
 }
 
-* {
-    box-sizing: border-box;
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg: #000000;
+        --surface: #1c1c1e;
+        --field: #2c2c2e;
+        --text: #f5f5f7;
+        --secondary: #a1a1a6;
+        --hairline: rgba(255, 255, 255, 0.12);
+        --accent: #2997ff;
+            --good: #30d158;
+        --bad: #ff6961;
+        --bar: rgba(0, 0, 0, 0.72);
+    }
 }
+
+* { box-sizing: border-box; }
 
 body {
-    margin: 0 auto;
-    max-width: 640px;
-    padding: 16px;
+    margin: 0;
     background: var(--bg);
     color: var(--text);
-    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-    line-height: 1.5;
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+    font-size: 17px;
+    line-height: 1.47;
+    letter-spacing: -0.011em;
+    -webkit-font-smoothing: antialiased;
 }
+
+main {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 28px 20px 72px;
+}
+
+/* Frosted top bar */
+.brand {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    padding: 12px 20px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 600;
+    background: var(--bar);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    backdrop-filter: saturate(180%) blur(20px);
+    border-bottom: 1px solid var(--hairline);
+}
+.brand a { color: var(--text); text-decoration: none; }
 
 h1 {
-    font-size: 1.75rem;
-    margin: 8px 0 4px;
+    font-size: 40px;
+    line-height: 1.08;
+    font-weight: 600;
+    letter-spacing: -0.035em;
+    margin: 0 0 8px;
 }
+@media (min-width: 600px) { h1 { font-size: 56px; } }
 
 h2 {
-    font-size: 1.15rem;
-    margin: 28px 0 8px;
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin: 44px 0 12px;
 }
 
-a {
-    color: var(--accent);
-}
+p { margin: 0 0 8px; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
 
+.muted { color: var(--secondary); }
+.small { font-size: 15px; }
+.lead { font-size: 21px; line-height: 1.38; color: var(--secondary); margin: 0 0 28px; }
+
+/* Surfaces: no borders or shadows, just contrast */
+.card, form {
+    background: var(--surface);
+    border-radius: 18px;
+    padding: 20px;
+}
+.card { margin-bottom: 12px; }
+h1 + .card { margin-top: 24px; }
+
+/* Grouped lists with hairline dividers */
+ul { list-style: none; padding: 0; margin: 0; }
+main > ul {
+    background: var(--surface);
+    border-radius: 18px;
+    padding: 0 20px;
+    margin-bottom: 16px;
+}
+main > ul > li { padding: 16px 0; border-bottom: 1px solid var(--hairline); }
+main > ul > li:last-child { border-bottom: 0; }
+
+/* Share links */
+.link-row { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; margin-top: 12px; }
 code {
     display: block;
-    padding: 8px 10px;
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 6px;
+    width: 100%;
+    font-family: inherit;
+    font-size: 15px;
+    color: var(--secondary);
     word-break: break-all;
 }
+details summary { cursor: pointer; font-weight: 600; }
+details p { margin-top: 10px; }
 
-ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
+/* Trip rows */
+.trip-name { font-size: 19px; font-weight: 600; color: var(--text); }
+.trip-row { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.count { font-size: 19px; font-weight: 600; white-space: nowrap; }
+
+/* Status: plain words, colored only when it matters */
+.status { display: flex; flex-wrap: wrap; column-gap: 14px; margin-top: 4px; font-size: 15px; font-weight: 500; color: var(--secondary); }
+.status .on { color: var(--good); }
+.status .closed { color: var(--bad); }
+
+/* Thin progress line */
+progress {
+    display: block;
+    width: 100%;
+    height: 4px;
+    margin: 12px 0 14px;
+    border: 0;
+    border-radius: 2px;
+    overflow: hidden;
+    background: var(--hairline);
+    accent-color: var(--accent);
+    appearance: none;
+    -webkit-appearance: none;
+}
+progress::-webkit-progress-bar { background: var(--hairline); }
+progress::-webkit-progress-value { background: var(--accent); border-radius: 2px; }
+progress::-moz-progress-bar { background: var(--accent); }
+
+.names { display: block; color: var(--secondary); }
+.names > li { display: inline; }
+.names > li:not(:last-child)::after { content: ", "; }
+
+/* Costs */
+.cost-row { display: flex; justify-content: space-between; gap: 12px; font-weight: 600; }
+.cost-note { display: flex; justify-content: space-between; gap: 12px; margin-top: 2px; }
+
+/* The number is the hero */
+.pay-card { text-align: center; padding: 48px 0 24px; }
+.pay-big {
+    font-size: 72px;
+    font-weight: 700;
+    line-height: 1.05;
+    letter-spacing: -0.05em;
+    margin: 4px 0 8px;
+    font-variant-numeric: tabular-nums;
 }
 
-li {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 10px 12px;
-    margin-bottom: 8px;
+.price-table { width: 100%; border-collapse: collapse; margin: 14px 0 0; font-variant-numeric: tabular-nums; }
+.price-table th, .price-table td {
+    text-align: left;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--hairline);
 }
+.price-table tr:last-child td { border-bottom: 0; }
+.price-table th { font-size: 13px; color: var(--secondary); font-weight: 500; }
+.price-table td:last-child, .price-table th:last-child { text-align: right; }
+.price-table .target-row { font-weight: 700; color: var(--accent); }
 
-form {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 14px;
-}
-
-label {
-    font-size: 0.9rem;
-    color: var(--muted);
-    margin-top: 6px;
-}
-
-input,
-select {
+/* Forms */
+form { display: flex; flex-direction: column; gap: 6px; margin-top: 12px; }
+label { font-size: 13px; font-weight: 500; color: var(--secondary); margin-top: 10px; }
+label:first-of-type { margin-top: 0; }
+input, select {
     font: inherit;
-    padding: 10px;
-    border: 1px solid var(--border);
-    border-radius: 6px;
+    letter-spacing: inherit;
+    color: var(--text);
+    background: var(--field);
+    padding: 13px 14px;
+    border: 0;
+    border-radius: 12px;
     width: 100%;
 }
+input::placeholder { color: var(--secondary); }
+input:focus-visible, select:focus-visible, button:focus-visible, a:focus-visible, summary:focus-visible {
+    outline: 3px solid var(--accent);
+    outline-offset: 2px;
+}
 
-button,
-.button {
+/* Pill buttons */
+button, .button {
     display: inline-block;
     font: inherit;
-    font-weight: 600;
-    margin-top: 10px;
-    padding: 12px 16px;
-    border: none;
-    border-radius: 6px;
-    background: var(--accent);
-    color: #fff;
+    font-weight: 500;
+    letter-spacing: inherit;
+    margin-top: 14px;
+    padding: 12px 24px;
+    border: 0;
+    border-radius: 980px;
+    background: var(--button);
+    color: var(--on-accent);
     text-align: center;
     text-decoration: none;
     cursor: pointer;
+    transition: background-color 0.15s ease;
 }
+button:hover, .button:hover { background: var(--button-hover); text-decoration: none; }
+button.secondary {
+    background: transparent;
+    color: var(--accent);
+    margin: 0;
+    padding: 0;
+    border-radius: 0;
+}
+button.secondary:hover { background: transparent; text-decoration: underline; }
 
-button:hover,
-.button:hover {
-    background: var(--accent-dark);
-}
+.back { display: inline-block; margin-top: 32px; font-size: 15px; }
 
-.muted {
-    color: var(--muted);
-}
-
-.status-on {
-    color: var(--good);
-}
-
-.status-closed {
-    color: var(--bad);
-}
-
-.back {
-    display: inline-block;
-    margin-top: 24px;
-}
-h1 { font-size: 1.5rem; }                         /* phones: default */
-@media (min-width: 600px) { h1 { font-size: 2.25rem; } }  /* wide screens only */
-
-.price-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 8px 0 16px;
-}
-.price-table th,
-.price-table td {
-    text-align: left;
-    padding: 8px;
-    border-bottom: 1px solid #e5e7eb;
-}
-.price-table .target-row {
-    font-weight: 700;
-    background: #f0fdf4;
+@media (prefers-reduced-motion: reduce) {
+    button, .button { transition: none; }
 }
