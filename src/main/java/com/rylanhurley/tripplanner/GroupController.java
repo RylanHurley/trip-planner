@@ -5,6 +5,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
+import org.springframework.web.util.WebUtils;
+import java.time.Duration;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -88,11 +95,13 @@ public class GroupController {
 
     @GetMapping("/g/{token}/trips/{tripId}")
     public String showTrip(@PathVariable String token, @PathVariable Long tripId,
-                           @RequestParam(required = false) String org, Model model) {
+                           @RequestParam(required = false) String org, Model model,
+                           HttpServletRequest request) {
         TripGroup group = groupRepository.findByInviteToken(token);
         if (group == null) { return "redirect:/"; }
         Trip trip = tripRepository.findById(tripId).orElse(null);
         if (trip == null || !trip.getTripGroup().getId().equals(group.getId())) { return "redirect:/g/" + token; }
+        model.addAttribute("me", findMe(request, trip));
         model.addAttribute("group", group);
         model.addAttribute("trip", trip);
         List<CostItem> costs = costItemRepository.findByTrip(trip);
@@ -177,13 +186,17 @@ public class GroupController {
 
     @PostMapping("/g/{token}/trips/{tripId}/join")
     public String joinTrip(@PathVariable String token, @PathVariable Long tripId,
-                           @RequestParam(required = false) String org, @RequestParam String name) {
+                           @RequestParam(required = false) String org, @RequestParam String name,
+                           HttpServletRequest request, HttpServletResponse response) {
         TripGroup group = groupRepository.findByInviteToken(token);
         if (group == null) { return "redirect:/"; }
         Trip trip = tripRepository.findById(tripId).orElse(null);
         if (trip == null || !trip.getTripGroup().getId().equals(group.getId())) { return "redirect:/g/" + token; }
         String back = "redirect:/g/" + token + "/trips/" + tripId + (group.isOrganizer(org) ? "?org=" + org : "");
         if (!trip.isCommitOpen(LocalDate.now())) {
+            return back;
+        }
+        if (findMe(request, trip) != null) {
             return back;
         }
         String trimmed = name.trim();
@@ -194,9 +207,63 @@ public class GroupController {
         participant.setName(trimmed);
         participant.setTrip(trip);
         participantRepository.save(participant);
+        setMyCookie(response, tripId, participant.getLeaveToken(), Duration.ofDays(365));
         return back;
     }
+    @PostMapping("/g/{token}/trips/{tripId}/leave")
+    public String leaveTrip(@PathVariable String token, @PathVariable Long tripId,
+                            @RequestParam(required = false) String org,
+                            HttpServletRequest request, HttpServletResponse response) {
+        TripGroup group = groupRepository.findByInviteToken(token);
+        if (group == null) { return "redirect:/"; }
+        Trip trip = tripRepository.findById(tripId).orElse(null);
+        if (trip == null || !trip.getTripGroup().getId().equals(group.getId())) { return "redirect:/g/" + token; }
+        String back = "redirect:/g/" + token + "/trips/" + tripId + (group.isOrganizer(org) ? "?org=" + org : "");
+        Participant me = findMe(request, trip);
+        if ( me==null||!trip.isCommitOpen(LocalDate.now()) ) {
+            return back;
+        }
+        participantRepository.delete(me);
+        setMyCookie(response, tripId, "", Duration.ZERO);
+        return back;
+    }
+    @PostMapping("/g/{token}/trips/{tripId}/participants/{participantId}/remove")
+    public String removeParticipant(@PathVariable String token, @PathVariable Long tripId, @PathVariable Long participantId,
+                                    @RequestParam(required = false) String org) {
+        TripGroup group = groupRepository.findByInviteToken(token);
+        if (group == null) { return "redirect:/"; }
+        Trip trip = tripRepository.findById(tripId).orElse(null);
+        if (trip == null || !trip.getTripGroup().getId().equals(group.getId())) { return "redirect:/g/" + token; }
+        if (!group.isOrganizer(org)) { return "redirect:/g/" + token + "/trips/" + tripId; }
+        Participant participant = participantRepository.findById(participantId).orElse(null);
+        if ( participant != null && participant.getTrip().getId().equals(trip.getId())) {
+            participantRepository.delete(participant);
+        }
+        return "redirect:/g/" + token + "/trips/" + tripId + "?org=" + org;
+    }
 
+    private Participant findMe(HttpServletRequest request, Trip trip) {
+        Cookie cookie = WebUtils.getCookie(request, "trip-" + trip.getId());
+        if (cookie == null) {
+            return null;
+        }
+        Participant me = participantRepository.findByLeaveToken(cookie.getValue());
+        if (me == null || !me.getTrip().getId().equals(trip.getId())) {
+            return null;
+        }
+        return me;
+    }
+
+    private void setMyCookie(HttpServletResponse response, Long tripId, String value, Duration maxAge) {
+        ResponseCookie cookie = ResponseCookie.from("trip-" + tripId, value)
+                .httpOnly(true)
+                .secure(true)
+                .sameSite("Lax")
+                .path("/")
+                .maxAge(maxAge)
+                .build();
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+    }
     private void addOrganizer(Model model, TripGroup group, String org) {
         boolean isOrganizer = group.isOrganizer(org);
         model.addAttribute("isOrganizer", isOrganizer);
