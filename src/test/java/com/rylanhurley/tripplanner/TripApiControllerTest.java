@@ -43,6 +43,7 @@ class TripApiControllerTest {
         mvc.perform(get("/api/groups/" + group.getInviteToken() + "/trips"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].name").value("Breck"))
-                .andExpect(jsonPath("$[0].organizerToken").doesNotExist());
+                .andExpect(jsonPath("$[0].organizerToken").doesNotExist())
+                .andExpect(jsonPath("$[0].costCount").value(0));
     }
 }

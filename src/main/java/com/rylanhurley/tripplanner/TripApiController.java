@@ -12,17 +12,18 @@ import java.util.List;
 @RestController
 public class TripApiController {
 
-    record TripSummary(Long id, String name, LocalDate startDate, int targetSize, int peopleIn) {}
+    record TripSummary(Long id, String name, LocalDate startDate, int targetSize, int peopleIn, int costCount) { }
 
     private final TripGroupRepository groupRepository;
     private final TripRepository tripRepository;
     private final ParticipantRepository participantRepository;
-
+    private final CostItemRepository costItemRepository;
     public TripApiController(TripGroupRepository groupRepository, TripRepository tripRepository,
-                             ParticipantRepository participantRepository) {
+                             ParticipantRepository participantRepository, CostItemRepository costItemRepository) {
         this.groupRepository = groupRepository;
         this.tripRepository = tripRepository;
         this.participantRepository = participantRepository;
+        this.costItemRepository = costItemRepository;
     }
 
     @GetMapping("/api/groups/{token}/trips")
@@ -33,7 +34,7 @@ public class TripApiController {
         }
         List<TripSummary> summaries = new ArrayList<>();
         for (Trip trip : tripRepository.findByTripGroup(group)) {
-            summaries.add(new TripSummary(trip.getId(),trip.getName(),trip.getStartDate(),trip.getTargetSize(),participantRepository.findByTrip(trip).size()));
+            summaries.add(new TripSummary(trip.getId(),trip.getName(),trip.getStartDate(),trip.getTargetSize(),participantRepository.findByTrip(trip).size(),costItemRepository.findByTrip(trip).size()));
         }
         return ResponseEntity.ok(summaries);
     }
