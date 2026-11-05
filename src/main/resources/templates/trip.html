@@ -8,16 +8,17 @@
 </head>
 <body>
 <header class="brand"><a th:href="'/g/' + ${group.inviteToken} + ${orgQuery}" th:text="${group.name}">Group</a></header>
+<main>
 <h1 th:text="${trip.name}">Trip name</h1>
 <p class="muted">
     <span th:text="${#temporals.format(trip.startDate, 'MMM d')}">start</span> to
     <span th:text="${#temporals.format(trip.endDate, 'MMM d, yyyy')}">end</span>
 </p>
-<div class="pills">
-    <span th:if="${tripOn}" class="pill on">The trip is on!</span>
-    <span th:if="${!tripOn and !commitOpen}" class="pill closed">Commits closed. Didn't hit the target.</span>
-    <span th:if="${!tripOn and commitOpen}" class="pill open">Commit by <span th:text="${#temporals.format(trip.commitDeadline, 'MMM d')}">deadline</span></span>
-    <span th:if="${isOrganizer}" class="pill org">You're the organizer</span>
+<div class="status">
+    <span th:if="${tripOn}" class="on">The trip is on!</span>
+    <span th:if="${!tripOn and !commitOpen}" class="closed">Commits closed. Didn't hit the target.</span>
+    <span th:if="${!tripOn and commitOpen}" class="open">Commit by <span th:text="${#temporals.format(trip.commitDeadline, 'MMM d')}">deadline</span></span>
+    <span th:if="${isOrganizer}" class="org">You're the organizer</span>
 </div>
 
 <h2>Who's in</h2>
@@ -35,9 +36,8 @@
     <button type="submit">I'm in</button>
 </form>
 
-<h2>What you'd pay</h2>
-<div class="card pay-card">
-    <p class="muted small">Each person, if <span th:text="${trip.targetSize}">0</span> people come</p>
+<div class="pay-card">
+    <p class="muted small">Each person pays, with <span th:text="${trip.targetSize}">0</span> people</p>
     <p class="pay-big">$<span th:text="${perPersonAtTarget}">0.00</span></p>
     <p class="small" th:if="${perPersonNow != null}">With the <span th:text="${participants.size()}">0</span> in now: <strong>$<span th:text="${perPersonNow}">0.00</span></strong></p>
 </div>
@@ -88,5 +88,6 @@
 </form>
 
 <a class="back" th:href="'/g/' + ${group.inviteToken} + ${orgQuery}">Back to group</a>
+</main>
 </body>
 </html>
