@@ -232,4 +232,6 @@ button.secondary:hover { background: transparent; text-decoration: underline; }
 
 @media (prefers-reduced-motion: reduce) {
     button, .button { transition: none; }
+    .edit-cost { margin-top: 8px; }
+    .edit-cost form { padding: 12px 0 0; background: transparent; }
 }
