@@ -234,4 +234,9 @@ button.secondary:hover { background: transparent; text-decoration: underline; }
     button, .button { transition: none; }
     .edit-cost { margin-top: 8px; }
     .edit-cost form { padding: 12px 0 0; background: transparent; }
+    .me-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+    .plain-form { padding: 0; margin: 0; background: transparent; display: block; }
+    .remove-list { margin-top: 10px; }
+    .remove-list li { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--hairline); }
+    .remove-list li:last-child { border-bottom: 0; }
 }

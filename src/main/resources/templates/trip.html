@@ -32,7 +32,26 @@
         <li th:each="participant : ${participants}" th:text="${participant.name}">Name</li>
     </ul>
 </div>
-<form th:if="${commitOpen}" th:action="'/g/' + ${group.inviteToken} + '/trips/' + ${trip.id} + '/join'" method="post">
+    <div class="card me-row" th:if="${me != null}">
+        <span>You're in as <strong th:text="${me.name}">Name</strong></span>
+        <form class="plain-form" th:if="${commitOpen}" th:action="'/g/' + ${group.inviteToken} + '/trips/' + ${trip.id} + '/leave'" method="post">
+            <input th:if="${isOrganizer}" type="hidden" name="org" th:value="${group.organizerToken}">
+            <button type="submit" class="secondary">I'm out</button>
+        </form>
+    </div>
+    <details class="card" th:if="${isOrganizer and !participants.isEmpty()}">
+        <summary>Remove someone</summary>
+        <ul class="remove-list">
+            <li th:each="participant : ${participants}">
+                <span th:text="${participant.name}">Name</span>
+                <form class="plain-form" th:action="'/g/' + ${group.inviteToken} + '/trips/' + ${trip.id} + '/participants/' + ${participant.id} + '/remove'" method="post">
+                    <input type="hidden" name="org" th:value="${group.organizerToken}">
+                    <button type="submit" class="secondary">Remove</button>
+                </form>
+            </li>
+        </ul>
+    </details>
+    <form th:if="${commitOpen and me == null}" th:action="'/g/' + ${group.inviteToken} + '/trips/' + ${trip.id} + '/join'" method="post">
     <input th:if="${isOrganizer}" type="hidden" name="org" th:value="${group.organizerToken}">
     <label for="participantName">Your name</label>
     <input id="participantName" name="name" type="text" required maxlength="30">

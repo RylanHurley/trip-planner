@@ -7,4 +7,6 @@ import java.util.List;
 public interface ParticipantRepository extends JpaRepository<Participant, Long> {
     List<Participant> findByTrip(Trip trip);
     boolean existsByTripAndNameIgnoreCase(Trip trip, String name);
+    Participant findByLeaveToken(String leaveToken);
+
 }

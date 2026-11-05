@@ -3,7 +3,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
-
+import java.util.UUID;
 @Entity
 public class Participant {
     @Id
@@ -12,7 +12,7 @@ public class Participant {
     private String name;
     @ManyToOne
     private Trip trip;
-
+    private String leaveToken = UUID.randomUUID().toString();
     public Participant() {}
 
     public Long getId() {
@@ -34,4 +34,5 @@ public class Participant {
     public void setTrip(Trip trip) {
         this.trip = trip;
     }
+    public String getLeaveToken() {return leaveToken;}
 }
