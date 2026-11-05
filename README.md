@@ -2,7 +2,7 @@
 
 Plan group trips without the group-chat chaos: make a private group, share one invite link, add trips, and see who's in and what it costs before the commit deadline.
 
-> **Status:** in progress. Live link coming soon (deploying to Render + Neon Postgres).
+> **Live app:** https://trip-planner-sqxd.onrender.com (free tier: the first visit can take about a minute to wake up)
 
 <p>
   <img src="docs/group-page.png" alt="Group page with trips and an add-trip form" width="300">
@@ -37,5 +37,5 @@ Then open http://localhost:8080. Tests: `./mvnw test`
 
 ## Roadmap
 - [ ] Per-person cost: split total ÷ people in + each costs, and a price-by-group-size table
-- [ ] Deploy (Render + Neon) and add the live link here
+- [x] Deploy (Render + Neon) and add the live link here
 - [ ] Settle up: fewest payments to square everyone up
