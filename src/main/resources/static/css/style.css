@@ -37,10 +37,10 @@ body {
     margin: 0;
     background: var(--bg);
     color: var(--text);
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
     font-size: 17px;
     line-height: 1.47;
-    letter-spacing: -0.012em;
+    letter-spacing: -0.011em;
     -webkit-font-smoothing: antialiased;
 }
 
@@ -69,8 +69,8 @@ main {
 h1 {
     font-size: 40px;
     line-height: 1.08;
-    font-weight: 700;
-    letter-spacing: -0.028em;
+    font-weight: 600;
+    letter-spacing: -0.035em;
     margin: 0 0 8px;
 }
 @media (min-width: 600px) { h1 { font-size: 56px; } }
@@ -165,7 +165,7 @@ progress::-moz-progress-bar { background: var(--accent); }
     font-size: 72px;
     font-weight: 700;
     line-height: 1.05;
-    letter-spacing: -0.04em;
+    letter-spacing: -0.05em;
     margin: 4px 0 8px;
     font-variant-numeric: tabular-nums;
 }
