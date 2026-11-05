@@ -117,7 +117,8 @@ public class GroupController {
     public String addCost(@PathVariable String token, @PathVariable Long tripId,
                           @RequestParam(required = false) String org,
                           @RequestParam String name, @RequestParam BigDecimal amount,
-                          @RequestParam SplitType splitType) {
+                          @RequestParam SplitType splitType,
+                          @RequestParam(required = false) String link){
         BigDecimal val = new BigDecimal("10000");
         TripGroup group = groupRepository.findByInviteToken(token);
         if (group == null) { return "redirect:/"; }
@@ -127,8 +128,14 @@ public class GroupController {
         if (name.isBlank() || name.length() > 50 || amount.compareTo(BigDecimal.ZERO) <= 0 || amount.compareTo(val) > 0) {
             return "redirect:/g/" + token + "/trips/" + tripId + "?org=" + org;
         }
+        boolean hasLink = link != null && !link.isBlank();
+        if (hasLink && (!link.startsWith("https://")||link.length() >=255)) {
+            return "redirect:/g/" + token + "/trips/" + tripId + "?org=" + org;
+        }
+
         CostItem cost = new CostItem();
         cost.setName(name);
+        if (hasLink) { cost.setLink(link); }
         cost.setAmount(amount);
         cost.setSplitType(splitType);
         cost.setTrip(trip);

@@ -19,7 +19,7 @@ public class CostItem {
     private SplitType splitType;
     @ManyToOne
     private Trip trip;
-
+    private String link;
     public CostItem() {}
 
     public Long getId() {
@@ -57,4 +57,8 @@ public class CostItem {
     public void setTrip(Trip trip) {
         this.trip = trip;
     }
+
+    public String getLink() {return link;}
+
+    public void setLink(String link) {this.link = link;}
 }
